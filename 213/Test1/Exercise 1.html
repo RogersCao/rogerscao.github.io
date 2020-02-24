@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        table {
+            width: 600px;
+            border-collapse: collapse;
+            margin: auto;
+            background-color: white;
+            padding: 0;
+        }
+
+        tr:nth-child(even) {
+            background-color: lightgray;
+        }
+
+        td {
+            position: relative;
+            text-align: center;
+            border: 1px solid #ddd;
+            padding: 0;
+            margin: 0;
+            padding: 8px;
+        }
+
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid white;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>Distance converter</title>
+    <script type="text/javascript">
+        function clearPage() {
+            if (document.body.contains(document.getElementById("tabled"))) {
+                const myPage = document.getElementById("page");
+                const myTable = document.getElementById("tabled");
+                myTable.remove();
+            }
+        }
+
+        function takeInput() {
+            const input1 = parseInt(document.getElementById('input1').value);
+            const input2 = parseInt(document.getElementById('input2').value);
+            let numOfOutputRows;
+            let order;                                              //true for small to large, false for large to small
+            let direction;
+            if (document.getElementById('input1').value === "" && document.getElementById('input2').value === "") {//noting entered
+                alert("nothing entered");
+            } else if (document.getElementById('input1').value === "" && document.getElementById('input2').value !== "") {//only second entered
+                alert("If you only have one value, enter in the first box");
+            } else if (parseInt(document.getElementById('input1').value) < 0 || parseInt(document.getElementById('input2').value) < 0) {//one of them is negative
+                alert("Check your value, cannot be negative");
+            } else if (document.getElementById('input1').value !== "" && parseInt(document.getElementById('input1').value) > 0 && document.getElementById('input2').value === "") {
+                if (parseFloat(document.getElementById('input1').value) % 1 !== 0 && parseFloat(document.getElementById('input2').value) % 1 !== 0) {//check integer
+                    alert("Input must be integer");
+                } else {
+                    numOfOutputRows = 10;
+                    order = true;
+                    if (parseInt(document.getElementById('direction').value) === 1) {
+                        direction = true;
+                        populateTable(input1, numOfOutputRows, order, direction);
+                    } else {
+                        direction = false;
+                        populateTable(input1, numOfOutputRows, order, direction);
+                    }
+                }
+
+            } else if (parseFloat(document.getElementById('input1').value) % 1 !== 0 || parseFloat(document.getElementById('input2').value) % 1 !== 0) {//check integer
+                alert("Input must be integer");
+            } else if (document.getElementById('input1').value !== "" && parseInt(document.getElementById('input1').value) > 0 && document.getElementById('input2').value !== "" && parseInt(document.getElementById('input2').value) >= 0) {
+                if (parseInt(document.getElementById('direction').value) === 1) {
+                    direction = true;
+                    if (input1 > input2) {
+                        order = false;
+                        numOfOutputRows = input1 - input2;
+                        populateTable(input1, numOfOutputRows, order, direction);
+                    } else if (input1 < input2) {
+                        order = true;
+                        numOfOutputRows = input2 - input1 + 1;
+                        populateTable(input1, numOfOutputRows, order, direction);
+                    } else if (input1 === input2) {
+                        order = true;
+                        numOfOutputRows = 1;
+                        populateTable(input1, numOfOutputRows, order, direction);
+                    }
+                } else {
+                    direction = false;
+                    if (input1 > input2) {
+                        order = false;
+                        numOfOutputRows = input1 - input2;
+                        populateTable(input1, numOfOutputRows, order, direction);
+                    } else if (input1 < input2) {
+                        order = true;
+                        numOfOutputRows = input2 - input1 + 1;
+                        populateTable(input1, numOfOutputRows, order, direction);
+                    } else if (input1 === input2) {
+                        order = true;
+                        numOfOutputRows = 1;
+                        populateTable(input1, numOfOutputRows, order, direction);
+                    }
+                }
+            }
+        }
+
+        function convert(input, direction) {
+            const dir = Number(direction);                                      //1 from km to mi, else from mi to km
+            let output;
+            if (dir === 1) {
+                output = input / 1.609;
+                output = Math.round(output * 100.0) / 100;
+                return output;
+            } else {
+                output = 1.609 * input;
+                output = Math.round(output * 100.0) / 100;
+                return output;
+            }
+        }
+
+        function populateTable(original, numOfRows, order, direction) {
+            let td1;
+            let td2;//row
+            let tr;
+            let th;
+            let i;
+            const head = ["Kilometer", "Miles"];
+            const table = document.createElement("table");
+            table.setAttribute("id", "tabled");
+            const page = document.getElementById("page");
+            page.appendChild(table);
+
+            //table head
+            const thead = document.createElement("thead");
+            table.appendChild(thead);
+            const tr0 = document.createElement("tr");
+            thead.appendChild(tr0);
+            if (direction) {
+                for (i = 0; i < 2; i++) {
+                    th = document.createElement("th");
+                    tr0.appendChild(th);
+                    th.appendChild(document.createTextNode(head[i]));
+                }
+            } else {
+                for (i = 1; i >= 0; i--) {
+                    th = document.createElement("th");
+                    tr0.appendChild(th);
+                    th.appendChild(document.createTextNode(head[i]));
+                }
+            }
+            const tableBody = document.createElement("tbody");
+            if (direction) {
+                table.appendChild(tableBody);
+                if (order) {
+                    for (i = 0; i < numOfRows; i++) {                           //element in row
+                        tr = document.createElement("tr");
+                        td1 = document.createElement("td");
+                        td2 = document.createElement("td");
+
+                        td1.appendChild(document.createTextNode(original + i));
+                        td2.appendChild(document.createTextNode(convert((original + i), 1)));
+
+                        tr.appendChild(td1);
+                        tr.appendChild(td2);
+
+                        tableBody.appendChild(tr);                              //add row to body
+                    }
+                } else {
+                    for (i = 0; i <= numOfRows; i++) {                          //element in row
+                        tr = document.createElement("tr");                      //row
+                        td1 = document.createElement("td");
+                        td2 = document.createElement("td");
+
+                        td1.appendChild(document.createTextNode(original - i));
+                        td2.appendChild(document.createTextNode(convert((original - i), 1)));
+
+                        tr.appendChild(td1);
+                        tr.appendChild(td2);
+
+                        tableBody.appendChild(tr);                              //add row to body
+                    }
+                }
+            } else {
+                table.appendChild(tableBody);
+                if (order) {
+                    for (i = 0; i < numOfRows; i++) {                           //element in row
+                        tr = document.createElement("tr");                      //row
+                        td1 = document.createElement("td");
+                        td2 = document.createElement("td");
+
+                        td1.appendChild(document.createTextNode(original + i));
+                        td2.appendChild(document.createTextNode(convert((original + i), 0)));
+
+                        tr.appendChild(td1);
+                        tr.appendChild(td2);
+
+                        tableBody.appendChild(tr);                              //add row to body
+                    }
+                } else {
+                    for (i = 0; i <= numOfRows; i++) {                          //element in row
+                        tr = document.createElement("tr");                      //row
+                        td1 = document.createElement("td");
+                        td2 = document.createElement("td");
+
+                        td1.appendChild(document.createTextNode(original - i));
+                        td2.appendChild(document.createTextNode(convert((original - i), 0)));
+
+                        tr.appendChild(td1);
+                        tr.appendChild(td2);
+
+                        tableBody.appendChild(tr);                              //add row to body
+                    }
+                }
+            }
+        }
+
+    </script>
+</head>
+<body>
+<div id="page">
+    <input id="input1" type="text" placeholder="from" name="input1">
+    <input id="input2" type="text" placeholder="to" name="input2">
+    <select id="direction">
+        <option value="1">Kilometer to Miles</option>
+        <option value="0">Miles to Kilometer</option>
+    </select>
+    <button type="button"
+            onclick="clearPage(); takeInput();">
+        Convert
+    </button>
+    <br>
+</div>
+</body>
+</html>
