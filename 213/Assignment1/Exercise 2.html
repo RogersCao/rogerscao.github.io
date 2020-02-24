@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        table {
+            width: 600px;
+            border-collapse: collapse;
+            margin: auto;
+            background-color: white;
+            padding: 0;
+        }
+
+        table td {
+            position: relative;
+            text-align: center;
+            border: 1px solid #ddd;
+            padding: 0;
+            margin: 0;
+            padding: 8px;
+        }
+
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid white;
+        }
+
+        #total{text-align: center;}
+
+    </style>
+    <meta charset="UTF-8">
+    <title>Marking Form</title>
+    <script>
+        const head = ["Section", "Max", "Comment", "Mark"];
+
+        function Section(name, max, comment, mark) {
+            this.name = name;
+            this.max = max;
+            this.comment = comment;
+            this.mark = mark;
+        }
+
+        function populate() {
+            var table = document.createElement("table");
+            table.setAttribute("id", "contentTable");
+            var page = document.getElementById("page");
+            page.appendChild(table);
+
+            //table head
+            var thead = document.createElement("thead");
+            table.appendChild(thead);
+            var tr0 = document.createElement("tr");
+            thead.appendChild(tr0);
+            for (var i = 0; i < 4; i++) {
+                var th = document.createElement("th");
+                tr0.appendChild(th);
+                th.appendChild(document.createTextNode(head[i]));
+            }
+
+            //table head
+            var tableBody = document.createElement("tbody");
+            table.appendChild(tableBody);
+
+            for (var i = 0; i < elements.length; i++) {             //element in row
+                var tr = document.createElement("tr");                  //row
+                var td1 = document.createElement("td");
+                var td2 = document.createElement("td");
+                var td3 = document.createElement("td");
+                var td4 = document.createElement("td");
+
+                td1.appendChild(document.createTextNode(elements[i].name));
+                td2.appendChild(document.createTextNode(elements[i].max));
+                td3.appendChild(document.createElement("input"));
+                var selection = document.createElement("select");
+                //td4
+                selection.setAttribute("id", i.toString());
+                selection.setAttribute("onchange", "updateTotal()")
+                for (var j = 0; j <= elements[i].max; j++) {
+                    var z = document.createElement("option");
+
+                    var stringJ = j.toString();
+                    z.setAttribute("value", stringJ);
+                    var t = document.createTextNode(stringJ);
+                    z.appendChild(t);
+                    selection.appendChild(z);
+                }
+                td4.appendChild(selection);
+
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                tr.appendChild(td3);
+                tr.appendChild(td4);
+
+                tableBody.appendChild(tr);                              //add row to body
+            }
+        }
+
+        function updateTotal() {
+            var total = 0;
+            for (let i = 0; i < elements.length; i++) {
+                var x = document.getElementById(i.toString()).value;
+                total += parseInt(x);
+            }
+            document.getElementById("total").innerHTML = "Total mark: " + total;
+        }
+
+        function clearPage() {
+            if (document.body.contains(document.getElementById("contentTable"))) {
+                const myPage = document.getElementById("page");
+                const myTable = document.getElementById("contentTable");
+                myPage.removeChild(myTable);
+                alert("table cleared");
+            }
+            document.getElementById("total").innerHTML = "";
+            elements = [new Section("Dynamic Table", 20, "", 0), new Section("Intellij Usage", 10, "", 0), new Section("Calendar Control", 30, "", 0), new Section("Active Form", 20, "", 0), new Section("Object Database", 20, "", 0)];
+        }
+
+        let elements = [new Section("Dynamic Table", 20, "", 0), new Section("Intellij Usage", 10, "", 0), new Section("Calendar Control", 30, "", 0), new Section("Active Form", 20, "", 0), new Section("Object Database", 20, "", 0)];
+    </script>
+</head>
+<body onload="populate()">
+<div id="page">
+    <button onclick="clearPage();populate();">clear</button>
+    <br>
+    <br>
+</div>
+<p id="total"></p>
+</body>
+</html>

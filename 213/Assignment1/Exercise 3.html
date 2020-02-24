@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #inputSection {
+            text-align: center;
+        }
+
+        table {
+            width: 600px;
+            border-collapse: collapse;
+            margin: auto;
+            background-color: white;
+            padding: 0;
+        }
+
+        table td {
+            position: relative;
+            text-align: center;
+            border: 1px solid #ddd;
+            padding: 0;
+            margin: 0;
+            padding: 8px;
+        }
+
+        button {
+            margin-left: 45%;
+        }
+
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid white;
+        }
+    </style>
+    <script type="text/javascript">
+        var w;
+        var raw;//raw input
+        var text;//a processed version of text container
+        let table = [];//word and word count container 2d array
+        const head = ["Word", "Num of Occurrence"];
+        var sortBy = true;
+
+        function openFile(url) {
+            w = window.open();
+            w.location = url;
+            var myObj = document.getElementById("open");
+            myObj.remove();
+            document.getElementById("inputArea").remove();
+
+        }
+
+        function checkRepeat(input) {
+            for (var i = 0; i < text.length; i++) {
+                input[i] = input[i].toLowerCase();
+            }
+            input.sort();
+            while (true) {
+                if (input[0] === "") {
+                    input.shift();
+                } else {
+                    break;
+                }
+            }//remove all "" from raw input
+            var temp = null;
+            var count = 0;
+            for (var i = 0; i < input.length; i++) {
+                if (input[i] === temp) {
+                    count++;
+                    if (i === input.length - 1) {
+                        table.push([temp, count])
+                    }
+                } else {
+                    if (count > 0) {
+                        const occ = [temp, count];
+                        table.push(occ);
+                    }
+                    temp = input[i];
+                    count = 1;
+                }
+            }//insert array into table, ["word",num]
+        }
+
+        function retrieveText() {
+            var nodeList = w.document.querySelectorAll('*');
+            raw = nodeList[0].textContent;
+            text = raw.split(" ");
+            for (var i = 0; i < text.length; i++) {
+                text[i] = text[i].replace(/[^a-zA-Z ]/g, '');
+            }
+            checkRepeat(text);
+            populate();
+            var myObj = document.getElementById("get");
+            myObj.remove();
+        }
+
+        function populate() {
+            clearPage();
+            var tb = document.createElement("table");
+            tb.setAttribute("id", "contentTable");
+            var page = document.getElementById("page");
+            page.appendChild(tb);
+
+            var thead = document.createElement("thead");//table head
+            tb.appendChild(thead);
+            var tr0 = document.createElement("tr");
+            thead.appendChild(tr0);
+            for (var i = 0; i < head.length; i++) {
+                var th = document.createElement("th");
+                tr0.appendChild(th);
+                th.appendChild(document.createTextNode(head[i]));
+            }
+
+            var tableBody = document.createElement("tbody");
+            tb.appendChild(tableBody);
+
+            for (var i = 0; i < table.length; i++) {             //element in row
+                var tr = document.createElement("tr");                  //row
+                var td1 = document.createElement("td");
+                var td2 = document.createElement("td");
+
+                td1.appendChild(document.createTextNode(table[i][0]));
+                td2.appendChild(document.createTextNode(table[i][1]));
+
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+
+                tableBody.appendChild(tr);                              //add row to body
+            }
+        }
+
+        function clearPage() {
+            if (document.body.contains(document.getElementById("contentTable"))) {
+                const myPage = document.getElementById("page");
+                const myTable = document.getElementById("contentTable");
+                myPage.removeChild(myTable);
+            }
+        }
+
+        function sortTable() {
+            if (sortBy) {
+                table.sort(function (a, b) {
+                    var x = a[1];
+                    var y = b[1];
+                    return x - y;
+                });
+            } else {
+                table.sort();
+            }
+            sortBy = !sortBy;
+            populate();
+        }
+
+    </script>
+    <title></title>
+</head>
+<body>
+<div id="inputSection">
+    <p id="inputArea">Filename: <input id="url" name="url" size=15 type="Text"/></p>
+    <a href="javascript:openFile(document.getElementById('url').value)" id="open">Open document</a></br>
+    <a href="javascript:retrieveText(w.document.body)" id="get">Retrieve text</a><br/>
+</div>
+<div id="page">
+    <button onclick="sortTable()">Sort by different order</button>
+</div>
+</body>
+</html>
